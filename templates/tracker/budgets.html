@@ -1,0 +1,73 @@
+{% extends "tracker/base.html" %}
+{% load finance_extras %}
+{% block title %}Budgets{% endblock %}
+{% block subtitle %}Set monthly budgets for different categories{% endblock %}
+{% block content %}
+  <form class="panel inline-form" method="post">
+    {% csrf_token %}
+    {% if editing_budget %}<input type="hidden" name="budget_id" value="{{ editing_budget.id }}">{% endif %}
+    <label>Category{{ form.category }}</label>
+    <label>Budget Amount{{ form.amount }}</label>
+    <label>Month{{ form.month }}</label>
+    <button type="submit">{% if editing_budget %}Update Budget{% else %}+ Add Budget{% endif %}</button>
+    {{ form.errors }}
+  </form>
+  <section class="panel table-panel">
+    <table>
+      <thead><tr><th>Category</th><th>Budget</th><th>Spent</th><th>Remaining</th><th>Progress</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for budget in budgets %}
+          <tr>
+            <td>{{ budget.category }}</td>
+            <td>{{ budget.budget|currency }}</td>
+            <td>{{ budget.spent|currency }}</td>
+            <td class="{% if budget.remaining_budget < 0 %}expense{% else %}income{% endif %}">
+              {% if budget.remaining_budget < 0 %}
+                Exceeded By: {{ budget.exceeded_amount|currency }}
+              {% else %}
+                Remaining Budget: {{ budget.remaining_budget|currency }}
+              {% endif %}
+            </td>
+            <td><div class="progress budget {{ budget.status|lower }}"><span style="width: {{ budget.progress }}%"></span></div>{{ budget.progress }}%</td>
+            <td><mark class="{{ budget.status|lower }}">{{ budget.status }}</mark></td>
+            <td class="action-cell">
+              <a class="ghost" href="{% url 'budgets' %}?edit={{ budget.id }}">✎</a>
+              <form method="post" action="{% url 'delete_budget' budget.id %}" onsubmit="return confirm('Delete this budget?')">
+                {% csrf_token %}
+                <button class="ghost" type="submit">⌫</button>
+              </form>
+            </td>
+          </tr>
+          <tr class="budget-insight-row">
+            <td colspan="7">
+              {% if budget.budget_alert_type == "warning" %}
+                <div class="budget-warning">
+                  <strong>{{ budget.budget_alert_message }}</strong>
+                  <span>You have already used more than 80% of this month's budget.</span>
+                  <span>Remaining Amount: {{ budget.remaining_budget|currency }}</span>
+                  <span>Please monitor your spending carefully.</span>
+                </div>
+              {% elif budget.budget_alert_type == "limit" %}
+                <div class="budget-limit">
+                  <strong>{{ budget.budget_alert_message }}</strong>
+                  <span>You have fully utilized this budget.</span>
+                  <span>Any further spending may affect your monthly savings.</span>
+                </div>
+              {% elif budget.budget_alert_type == "exceeded" %}
+                <div class="budget-exceeded">
+                  <strong>{{ budget.budget_alert_message }}</strong>
+                  <span>Exceeded Amount: {{ budget.exceeded_amount|currency }}</span>
+                  <span>This category has exceeded the allocated budget.</span>
+                  <span>This overspending may reduce your savings and financial stability.</span>
+                </div>
+              {% endif %}
+              <div class="financial-suggestion">{{ budget.financial_suggestion }}</div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7">No budgets yet. Add a category budget to get insights.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% endblock %}

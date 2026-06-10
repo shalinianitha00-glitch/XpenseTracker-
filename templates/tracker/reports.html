@@ -1,0 +1,50 @@
+{% extends "tracker/base.html" %}
+{% load finance_extras %}
+{% block title %}Reports{% endblock %}
+{% block subtitle %}Analyze your spending patterns{% endblock %}
+{% block content %}
+  <script>
+    window.XPENSE_CHARTS = {{ chart_json|safe }};
+  </script>
+  {% include "tracker/partials/summary_cards.html" %}
+  <section class="dashboard-grid">
+    <div class="panel chart-panel wide">
+      <div class="panel-head">
+        <h2>Expense Trend</h2>
+        <div class="mini-tabs">
+          <a class="{% if selected_period == 'daily' %}active{% endif %}" href="?month={{ selected_month_value }}&period=daily">Daily</a>
+          <a class="{% if selected_period == 'monthly' %}active{% endif %}" href="?month={{ selected_month_value }}&period=monthly">Monthly</a>
+        </div>
+      </div>
+      <canvas id="spendingLine"></canvas>
+    </div>
+    <div class="panel chart-panel">
+      <h2>Expenses by Category</h2>
+      <canvas id="categoryDoughnut"></canvas>
+    </div>
+  </section>
+  <section class="insight-grid">
+    <article><small>Total Income</small><strong>{{ current_month_label }}</strong><b>{{ total_income|currency }}</b></article>
+    <article><small>Total Expenses</small><strong>{{ current_month_label }}</strong><b>{{ total_expenses|currency }}</b></article>
+    <article><small>Transactions</small><strong>This month</strong><b>{{ transactions|length }} records</b></article>
+    <article><small>Best Saving Day</small><strong>{{ best_saving_day }}</strong><b>{{ best_saving_amount|currency }}</b></article>
+  </section>
+  <section class="panel surplus-summary-panel">
+    <div class="panel-head">
+      <h2>Monthly Financial Summary</h2>
+      <mark>{{ surplus_analysis.recommendation }}</mark>
+    </div>
+    <div class="surplus-summary-grid">
+      <article><small>Total Income</small><strong>{{ surplus_analysis.monthly_income|currency }}</strong></article>
+      <article><small>Total Expenses</small><strong>{{ surplus_analysis.monthly_expenses|currency }}</strong></article>
+      <article><small>Total Savings</small><strong>{{ surplus_analysis.monthly_surplus|currency }}</strong></article>
+      <article><small>Emergency Fund Contribution</small><strong>{{ surplus_analysis.emergency_contribution|currency }}</strong></article>
+      <article><small>Goal Contribution</small><strong>{{ surplus_analysis.goal_contribution|currency }}</strong></article>
+    </div>
+    <div class="surplus-report-note">
+      <strong>Monthly Surplus</strong>
+      <span>{{ surplus_analysis.monthly_surplus|currency }}</span>
+      <small>Recommended Savings Allocation: {{ surplus_analysis.recommendation }}</small>
+    </div>
+  </section>
+{% endblock %}

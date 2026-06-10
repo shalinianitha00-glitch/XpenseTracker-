@@ -1,0 +1,40 @@
+{% extends "tracker/auth_base.html" %}
+{% block title %}XpenseTrack | Home{% endblock %}
+{% block content %}
+  <section class="hero-auth">
+    <nav class="home-nav">
+      <a class="brand" href="{% url 'home' %}">
+        <span class="brand-mark">💸</span>
+        <span>Xpense<span>Track</span></span>
+      </a>
+      <div>
+        <a href="{% url 'login' %}">Login</a>
+        <a class="nav-cta" href="{% url 'signup' %}">Create Account</a>
+      </div>
+    </nav>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Smart money control</p>
+        <h1>Track every rupee with a dashboard that feels powerful.</h1>
+        <p>Manage expenses, budgets, savings goals, reports, and category insights in one secure place.</p>
+        <div class="hero-points">
+          <span>Secure login</span>
+          <span>Live budgets</span>
+          <span>Savings goals</span>
+        </div>
+      </div>
+      <div class="hero-preview">
+        <div class="preview-card total">
+          <span>Total Balance</span>
+          <strong>₹45,231.80</strong>
+          <small>↗ 12.5% this month</small>
+        </div>
+        <div class="preview-chart">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="preview-card mini income"><b>Income</b><strong>₹76,200</strong></div>
+        <div class="preview-card mini expense"><b>Expenses</b><strong>₹5,649</strong></div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

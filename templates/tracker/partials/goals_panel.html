@@ -1,0 +1,42 @@
+{% load finance_extras %}
+<div class="panel">
+  <div class="panel-head">
+    <h2>Savings Goals</h2>
+    <a href="{% url 'savings_goals' %}">View All ›</a>
+  </div>
+  <div class="goal-stack">
+    {% for goal in goals %}
+      <article class="goal-row">
+        <span class="goal-icon">{{ goal.emoji }}</span>
+        <div class="goal-info">
+          <div>
+            <strong>{{ goal.name }}</strong>
+            <em>{{ goal.display_progress }}%</em>
+          </div>
+          <div class="progress"><span style="width: {{ goal.display_progress }}%"></span></div>
+          <small>{{ goal.saved|currency }} / {{ goal.display_target|currency }} <i>Due in {{ goal.days }} days</i></small>
+          {% if goal.goal_type == "emergency" %}
+            <div class="emergency-goal-details">
+              <span>Recommended Amount: {{ goal.recommended_emergency_fund|currency }}</span>
+              <span>Current Amount: {{ goal.saved|currency }}</span>
+              <div class="progress"><span style="width: {{ goal.emergency_progress }}%"></span></div>
+              <strong>{{ goal.preparedness_status }}</strong>
+              {% if goal.emergency_alert %}
+                <em>{{ goal.emergency_alert }}</em>
+              {% endif %}
+            </div>
+          {% endif %}
+          {% if active == "savings_goals" %}
+            <div class="goal-actions">
+              <a class="ghost" href="{% url 'savings_goals' %}?edit={{ goal.id }}">✎ Edit</a>
+              <form method="post" action="{% url 'delete_goal' goal.id %}" onsubmit="return confirm('Delete this goal?')">
+                {% csrf_token %}
+                <button class="ghost" type="submit">⌫ Delete</button>
+              </form>
+            </div>
+          {% endif %}
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+</div>

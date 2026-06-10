@@ -1,0 +1,88 @@
+{% load static %}
+{% load finance_extras %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>XpenseTrack</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'tracker/css/styles.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="theme-{{ preference.theme|default:'dark' }}">
+  <aside class="sidebar">
+    <a class="brand" href="{% url 'dashboard' %}">
+      <span class="brand-mark">💸</span>
+      <span>Xpense<span>Track</span></span>
+    </a>
+    <p class="tagline">Track. Manage. Save.</p>
+    <nav class="nav">
+      <a class="{% if active == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}"><span>⌂</span>Dashboard</a>
+      <a class="{% if active == 'transactions' %}active{% endif %}" href="{% url 'transactions' %}"><span>☷</span>Transactions</a>
+      <a class="{% if active == 'add_expense' %}active{% endif %}" href="{% url 'add_expense' %}"><span>⊕</span>Add Expense</a>
+      <a class="{% if active == 'categories' %}active{% endif %}" href="{% url 'categories' %}"><span>□</span>Categories</a>
+      <a class="{% if active == 'budgets' %}active{% endif %}" href="{% url 'budgets' %}"><span>◔</span>Budgets</a>
+      <a class="{% if active == 'savings_goals' %}active{% endif %}" href="{% url 'savings_goals' %}"><span>◎</span>Savings Goals</a>
+      <a class="{% if active == 'reports' %}active{% endif %}" href="{% url 'reports' %}"><span>▥</span>Reports</a>
+      <a class="{% if active == 'calendar' %}active{% endif %}" href="{% url 'calendar' %}"><span>▣</span>Calendar</a>
+      <a class="{% if active == 'settings' %}active{% endif %}" href="{% url 'settings' %}"><span>⚙</span>Settings</a>
+    </nav>
+    <section class="save-card">
+      <div class="save-visual">💰</div>
+      <h3>Start Saving Today!</h3>
+      <p>Set a goal and track your savings progress.</p>
+      <a href="{% url 'savings_goals' %}">+ Create Goal</a>
+    </section>
+  </aside>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <h1>{% block title %}Hello, {{ request.user.first_name|default:request.user.username }}! 👋{% endblock %}</h1>
+        <p>{% block subtitle %}Here's your financial overview{% endblock %}</p>
+      </div>
+      <div class="top-actions">
+        <form class="month-picker" method="get">
+          <span>▣</span>
+          <input id="topMonth" name="month" type="month" value="{{ selected_month_value }}" onchange="this.form.submit()">
+        </form>
+        <div class="top-menu">
+          <button class="icon-btn js-menu-btn" type="button" aria-label="Notifications" data-menu="notificationsMenu">🔔<span></span></button>
+          <div class="popover" id="notificationsMenu" hidden>
+            <strong>Notifications</strong>
+            <p>No new alerts</p>
+          </div>
+        </div>
+        <div class="profile top-menu">
+          <button class="profile-trigger js-menu-btn" type="button" data-menu="profileMenu">
+            <div class="avatar">{{ user_initial }}</div>
+            <span>⌄</span>
+          </button>
+          <div class="popover profile-popover" id="profileMenu" hidden>
+            <strong>{{ user_display_name }}</strong>
+            <p>{{ request.user.email|default:"No email added" }}</p>
+            <a href="{% url 'settings' %}">Open Settings</a>
+          </div>
+        </div>
+        <form class="logout-form" method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button class="date-btn" type="submit">Logout</button>
+        </form>
+      </div>
+    </header>
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="{% static 'tracker/js/app.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+{% load finance_extras %}
+
+<section class="summary-grid">
+
+  <article class="metric purple">
+    <p>Total Balance</p>
+    <h2>{{ currency_symbol }}{{ total_balance|floatformat:2 }}</h2>
+{% if total_balance > 0 %}
+    <span>Balance available</span>
+{% else %}
+    <span>No data available</span>
+{% endif %}
+    <b>👛</b>
+  </article>
+
+  <article class="metric green">
+    <p>Total Income</p>
+    <h2>{{ currency_symbol }}{{ total_income|floatformat:2 }}</h2>
+{% if total_income > 0 %}
+    <span>Income recorded</span>
+{% else %}
+    <span>No income yet</span>
+{% endif %}
+    <b>💼</b>
+  </article>
+
+  <article class="metric pink">
+    <p>Total Expenses</p>
+    <h2>{{ currency_symbol }}{{ total_expenses|floatformat:2 }}</h2>
+{% if total_expenses > 0 %}
+    <span>Expense activity recorded</span>
+{% else %}
+    <span>No expenses yet</span>
+{% endif %}
+    <b>🛒</b>
+  </article>
+
+  <article class="metric gold">
+    <p>This Month Savings</p>
+    <h2>{{ currency_symbol }}{{ savings|floatformat:2 }}</h2>
+{% if savings > 0 %}
+    <span>Savings in progress</span>
+{% else %}
+    <span>Start saving today</span>
+{% endif %}
+    <b>🏦</b>
+  </article>
+
+</section>

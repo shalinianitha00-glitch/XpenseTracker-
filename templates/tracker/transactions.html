@@ -1,0 +1,62 @@
+{% extends "tracker/base.html" %}
+{% load finance_extras %}
+{% block title %}All Transactions{% endblock %}
+{% block subtitle %}Track all your income and expenses{% endblock %}
+{% block content %}
+  <form class="toolbar" method="get">
+    <input id="searchInput" name="q" value="{{ search }}" type="search" placeholder="Search transactions...">
+    <select name="type">
+      <option value="">All Types</option>
+      <option value="income" {% if selected_type == "income" %}selected{% endif %}>Income</option>
+      <option value="expense" {% if selected_type == "expense" %}selected{% endif %}>Expense</option>
+    </select>
+    <select><option>{{ date_range_label }}</option></select>
+    <select name="category">
+      <option value="">All Categories</option>
+      {% for cat in categories %}
+        <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Apply</button>
+    <div class="export-menu top-menu">
+      <button class="export-btn js-menu-btn" type="button" data-menu="exportMenu">Export</button>
+      <div class="popover" id="exportMenu" hidden>
+        <strong>Export Options</strong>
+        <a href="{% url 'export_transactions' %}?format=csv&month={{ selected_month_value }}">CSV spreadsheet</a>
+        <a href="{% url 'export_transactions' %}?format=txt&month={{ selected_month_value }}">Text summary</a>
+        <a href="{% url 'export_transactions' %}?format=pdf&month={{ selected_month_value }}">Printable PDF file</a>
+      </div>
+    </div>
+  </form>
+  <section class="panel table-panel">
+    <div class="tabs">
+      <a class="{% if not selected_type %}active{% endif %}" href="{% url 'transactions' %}?month={{ selected_month_value }}">All</a>
+      <a class="{% if selected_type == 'income' %}active{% endif %}" href="{% url 'transactions' %}?type=income&month={{ selected_month_value }}">Income</a>
+      <a class="{% if selected_type == 'expense' %}active{% endif %}" href="{% url 'transactions' %}?type=expense&month={{ selected_month_value }}">Expense</a>
+    </div>
+    <table>
+      <thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="transactionTable">
+        {% for item in transactions %}
+          <tr>
+            <td>{{ item.date }}</td>
+            <td>{{ item.description }}</td>
+            <td><span class="mini-icon">{{ item.icon }}</span>{{ item.category }}</td>
+            <td class="{% if item.amount > 0 %}income{% else %}expense{% endif %}">{% if item.amount > 0 %}+{% endif %}{{ item.amount|currency }}</td>
+            <td>{{ item.status }}</td>
+            <td class="action-cell">
+              <a class="ghost" href="{% url 'add_expense' %}?edit={{ item.id }}">✎</a>
+              <form method="post" action="{% url 'delete_transaction' item.id %}" onsubmit="return confirm('Delete this transaction?')">
+                {% csrf_token %}
+                <button class="ghost" type="submit">⌫</button>
+              </form>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6">No transactions yet. Add income or expense to get started.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% include "tracker/partials/summary_cards.html" %}
+{% endblock %}

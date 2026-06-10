@@ -1,0 +1,22 @@
+{% load finance_extras %}
+<div class="panel">
+  <div class="panel-head">
+    <h2>Recent Transactions</h2>
+    <a href="{% url 'transactions' %}">View All ›</a>
+  </div>
+  <div class="transaction-stack">
+    {% for item in transactions|slice:":5" %}
+      <div class="transaction-row">
+        <span class="emoji-badge">{{ item.icon }}</span>
+        <div>
+          <strong>{{ item.description }}</strong>
+          <small>{{ item.category }}</small>
+        </div>
+        <time>{{ item.date }}</time>
+        <b class="{% if item.amount > 0 %}income{% else %}expense{% endif %}">
+          {% if item.amount > 0 %}+{% endif %}{{ item.amount|currency }}
+        </b>
+      </div>
+    {% endfor %}
+  </div>
+</div>

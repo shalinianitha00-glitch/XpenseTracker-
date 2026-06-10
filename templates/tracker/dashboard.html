@@ -1,0 +1,150 @@
+{% extends "tracker/base.html" %}
+{% load finance_extras %}
+{% block content %}
+  <script>
+    window.XPENSE_CHARTS = {{ chart_json|safe }};
+  </script>
+  {% if daily_reminder_pending %}
+    <div class="panel daily-reminder-alert">
+      <strong>🔔 Daily Reminder</strong>
+      <span>No transaction has been recorded today.</span>
+      <p>Don't forget to update today's expenses for accurate financial tracking.</p>
+    </div>
+  {% endif %}
+  {% include "tracker/partials/summary_cards.html" %}
+  <section class="dashboard-grid">
+    <div class="panel chart-panel wide">
+      <div class="panel-head">
+        <h2>Expenses Overview</h2>
+        <div class="mini-tabs">
+          <a class="{% if selected_period == 'monthly' %}active{% endif %}" href="?month={{ selected_month_value }}&period=monthly">Months</a>
+          <a class="{% if selected_period == 'daily' %}active{% endif %}" href="?month={{ selected_month_value }}&period=daily">Days</a>
+        </div>
+      </div>
+      <canvas id="spendingLine"></canvas>
+    </div>
+    <div class="panel chart-panel">
+      <h2>Expenses by Category</h2>
+      <div class="chart-with-list">
+        <canvas id="categoryDoughnut"></canvas>
+        <div class="category-list">
+          {% for cat in categories %}
+            <div><span style="background: {{ cat.color }}">{{ cat.emoji }}</span><b>{{ cat.name }}</b><em>{{ cat.spent|currency }}</em><small>{{ cat.percent }}%</small></div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="panel emergency-card">
+      <div class="panel-head">
+        <h2>Emergency Preparedness</h2>
+      </div>
+      <div class="emergency-summary">
+        <p><span>Recommended Fund</span><strong>{{ emergency_summary.recommended|currency }}</strong></p>
+        <p><span>Current Fund</span><strong>{{ emergency_summary.current|currency }}</strong></p>
+        <p><span>Preparedness</span><strong>{{ emergency_summary.progress }}%</strong></p>
+        <mark>{{ emergency_summary.status }}</mark>
+      </div>
+      {% if emergency_summary.alert %}
+        <div class="{% if emergency_summary.progress < 30 %}emergency-warning{% else %}emergency-healthy{% endif %}">{{ emergency_summary.alert }}</div>
+      {% endif %}
+    </div>
+    <div class="panel health-score-card">
+      <div class="panel-head">
+        <h2>Financial Health Score</h2>
+        <mark class="{{ financial_health.status_class }}">{{ financial_health.score }}/100</mark>
+      </div>
+      <div class="health-score-main">
+        <strong>{{ financial_health.score }}</strong>
+        <span>/100</span>
+      </div>
+      <div class="progress health-progress">
+        <span style="width: {{ financial_health.score }}%"></span>
+      </div>
+      <p class="health-status {{ financial_health.status_class }}">{{ financial_health.status }}</p>
+      <div class="health-insights">
+        <p><span>Top Positive Factor</span><strong>{{ financial_health.top_positive }}</strong></p>
+        <p><span>Top Improvement Area</span><strong>{{ financial_health.top_improvement }}</strong></p>
+      </div>
+    </div>
+    <div class="panel reminder-status-card">
+      <div class="panel-head">
+        <h2>Reminder Status</h2>
+      </div>
+      {% if daily_reminder_enabled %}
+        {% if daily_reminder_pending %}
+          <mark class="warning">⚠ Waiting for today's expense entry</mark>
+        {% else %}
+          <mark>✅ Today's expenses recorded</mark>
+        {% endif %}
+        <small>Reminder time: {{ daily_reminder_time|time:"h:i A" }}</small>
+      {% else %}
+        <mark class="warning">Daily reminder is turned off</mark>
+        <small>Enable it from Settings → Notifications</small>
+      {% endif %}
+    </div>
+    <div class="panel surplus-card">
+      <div class="panel-head">
+        <h2>💰 Monthly Surplus</h2>
+      </div>
+      <div class="surplus-lines">
+        <p><span>Income</span><strong>{{ surplus_analysis.monthly_income|currency }}</strong></p>
+        <p><span>Expenses</span><strong>{{ surplus_analysis.monthly_expenses|currency }}</strong></p>
+        <p><span>Remaining</span><strong>{{ surplus_analysis.monthly_surplus|currency }}</strong></p>
+      </div>
+      <div class="surplus-allocation">
+        <small>Suggested Allocation</small>
+        <p><span>Emergency Fund</span><strong>{{ surplus_analysis.emergency_contribution|currency }}</strong></p>
+        <p><span>Savings Goal</span><strong>{{ surplus_analysis.goal_contribution|currency }}</strong></p>
+        <mark>{{ surplus_analysis.recommendation }}</mark>
+      </div>
+    </div>
+    <div class="panel smart-insights-card">
+      <div class="panel-head">
+        <h2>📊 Smart Insights</h2>
+      </div>
+      <div class="smart-insights-grid">
+        <article>
+          <span>🔥 Highest Spending Category</span>
+          <strong>{{ highest_spending_category }}</strong>
+          <small>{{ highest_spending_amount|currency }} spent this month</small>
+        </article>
+        <article>
+          <span>⚠ Budget Alert</span>
+          {% if budget_alerts %}
+            {% for alert in budget_alerts %}
+              {% if forloop.first %}
+                <strong>{{ alert.category }}</strong>
+                <small>{{ alert.message }}</small>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            <strong>All budgets are within limits</strong>
+            <small>No exceeded budgets right now</small>
+          {% endif %}
+        </article>
+        <article>
+          <span>🎯 Goal Progress</span>
+          <strong>{{ closest_goal }}</strong>
+          <small>{{ closest_goal_progress }}% completed</small>
+        </article>
+        <article>
+          <span>🚨 Emergency Fund</span>
+          <strong>{{ emergency_fund_progress }}% prepared</strong>
+          <small>Status: {{ emergency_fund_status }}</small>
+        </article>
+        <article>
+          <span>💚 Financial Health</span>
+          <strong>{{ financial_health_score }} / 100</strong>
+          <small>Status: {{ financial_health_status }}</small>
+        </article>
+        <article>
+          <span>📈 Trend</span>
+          <strong>{{ monthly_spending_trend }}</strong>
+          <small>{{ highest_spending_category }} accounts for {{ largest_category_percentage }}% of total spending this month.</small>
+        </article>
+      </div>
+    </div>
+    {% include "tracker/partials/transactions_list.html" %}
+    {% include "tracker/partials/goals_panel.html" %}
+  </section>
+{% endblock %}

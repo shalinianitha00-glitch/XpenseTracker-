@@ -1,0 +1,32 @@
+{% extends "tracker/base.html" %}
+{% load finance_extras %}
+{% block title %}Savings Goals{% endblock %}
+{% block subtitle %}Track your saving goals and achieve them{% endblock %}
+{% block content %}
+  <script>
+    window.XPENSE_CHARTS = {{ chart_json|safe }};
+  </script>
+  <form class="panel inline-form" method="post">
+    {% csrf_token %}
+    {% if editing_goal %}<input type="hidden" name="goal_id" value="{{ editing_goal.id }}">{% endif %}
+    <label>Goal Name{{ form.name }}</label>
+    <label>Type{{ form.goal_type }}</label>
+    <label>Emoji{{ form.emoji }}</label>
+    <label>Saved Amount{{ form.saved_amount }}</label>
+    <label>Target Amount{{ form.target_amount }}</label>
+    <label>Deadline{{ form.deadline }}</label>
+    <button type="submit">{% if editing_goal %}Update Goal{% else %}+ Add Goal{% endif %}</button>
+    {{ form.errors }}
+  </form>
+  <section class="split-grid">
+    {% include "tracker/partials/goals_panel.html" %}
+    <div class="panel chart-panel savings-card">
+      <h2>Savings Overview</h2>
+      <canvas id="savingsDoughnut"></canvas>
+      <div class="small-summary">
+        <b>{{ savings|currency }}</b>
+        <span>Net Savings</span>
+      </div>
+    </div>
+  </section>
+{% endblock %}

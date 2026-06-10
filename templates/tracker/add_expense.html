@@ -1,0 +1,34 @@
+{% extends "tracker/base.html" %}
+{% block title %}Add New Expense{% endblock %}
+{% block subtitle %}Fill in the details below to add a new expense{% endblock %}
+{% block content %}
+  <section class="form-layout">
+    <form class="panel expense-form" method="post">
+      {% csrf_token %}
+      {% if editing_transaction %}<input type="hidden" name="transaction_id" value="{{ editing_transaction.id }}">{% endif %}
+      <label>Title{{ form.title }}</label>
+      <label>Type{{ form.transaction_type }}</label>
+      <label>Amount{{ form.amount }}</label>
+      <label>Category{{ form.category }}</label>
+      <label>Date{{ form.date }}</label>
+      <label>Payment Method{{ form.payment_method }}</label>
+      <label>Status{{ form.status }}</label>
+      <label>Notes{{ form.notes }}</label>
+      {{ form.errors }}
+      <div class="form-actions"><a class="cancel-btn" href="{% url 'transactions' %}">Cancel</a><button type="submit">{% if editing_transaction %}Update Transaction{% else %}Save Transaction{% endif %}</button></div>
+    </form>
+    <aside class="side-panels">
+      <div class="panel">
+        <h2>Quick Categories</h2>
+        <div class="quick-grid">
+          {% for cat in categories %}
+            {% if cat.name != "Income" %}
+              <button type="button" data-category-name="{{ cat.name }}">{{ cat.emoji }}<span>{{ cat.name }}</span></button>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% include "tracker/partials/transactions_list.html" %}
+    </aside>
+  </section>
+{% endblock %}

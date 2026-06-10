@@ -1,0 +1,49 @@
+{% extends "tracker/base.html" %}
+{% load finance_extras %}
+{% block title %}Calendar{% endblock %}
+{% block subtitle %}View your expenses by date{% endblock %}
+{% block content %}
+  <section class="calendar-layout">
+    <div class="panel calendar-panel">
+      <div class="panel-head">
+        <h2>{{ month_name }}</h2>
+        <div class="calendar-actions">
+          <a href="?">Today</a>
+          <a href="?month={{ previous_month_value }}">‹</a>
+          <a href="?month={{ next_month_value }}">›</a>
+        </div>
+      </div>
+      <div class="calendar-grid days"><b>Sun</b><b>Mon</b><b>Tue</b><b>Wed</b><b>Thu</b><b>Fri</b><b>Sat</b></div>
+      <div class="calendar-grid">
+        {% for cell in calendar_cells %}
+          <span class="{% if cell.muted %}muted{% endif %} {% if cell.selected %}selected{% endif %}">
+            {{ cell.day }}
+            {% if cell.income %}<em class="income">+{{ cell.income|currency }}</em>{% endif %}
+            {% if cell.expense %}<em class="expense">-{{ cell.expense|currency }}</em>{% endif %}
+          </span>
+        {% endfor %}
+      </div>
+    </div>
+    <aside class="panel date-detail">
+      <h2>{{ today_label }}</h2>
+      <p>Total Expenses</p>
+      <strong class="expense">{{ selected_expense|currency }}</strong>
+      <hr>
+      <h3>Transactions ({{ selected_day_transactions|length }})</h3>
+      {% for item in selected_day_transactions %}
+        <div class="transaction-row">
+          <span class="emoji-badge">{{ item.icon }}</span>
+          <div><strong>{{ item.description }}</strong><small>{{ item.category }}</small></div>
+          <b class="{% if item.amount > 0 %}income{% else %}expense{% endif %}">{% if item.amount > 0 %}+{% endif %}{{ item.amount|currency }}</b>
+        </div>
+      {% empty %}
+        <p>No transactions today.</p>
+      {% endfor %}
+      <hr>
+      <h3>Day Summary</h3>
+      <p>Income <b class="income">{{ selected_income|currency }}</b></p>
+      <p>Expenses <b class="expense">{{ selected_expense|currency }}</b></p>
+      <p>Net <b class="{% if selected_net >= 0 %}income{% else %}expense{% endif %}">{{ selected_net|currency }}</b></p>
+    </aside>
+  </section>
+{% endblock %}

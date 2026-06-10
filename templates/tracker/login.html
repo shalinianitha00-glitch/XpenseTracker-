@@ -1,0 +1,130 @@
+{% extends "tracker/auth_base.html" %}
+{% block title %}Login | XpenseTrack{% endblock %}
+
+{% block content %}
+
+<div class="vault-content">
+
+    <div class="vault-badge">
+        🔐 Secure Login
+    </div>
+
+    <h1>Welcome Back</h1>
+
+    <p>
+        Access your personal financial workspace.
+        Track expenses, monitor budgets and manage
+        your savings goals securely.
+    </p>
+
+    <div class="security-points">
+
+        <div>
+            ✓ Encrypted Authentication
+        </div>
+
+        <div>
+            ✓ Secure Financial Records
+        </div>
+
+        <div>
+            ✓ Private Dashboard Access
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="network-bg">
+
+    <span class="node n1"></span>
+    <span class="node n2"></span>
+    <span class="node n3"></span>
+    <span class="node n4"></span>
+    <span class="node n5"></span>
+
+</div>
+
+
+<div class="floating-finance finance-1">
+    💳
+</div>
+
+<div class="floating-finance finance-2">
+    📈
+</div>
+
+<div class="floating-finance finance-3">
+    💰
+</div>
+
+
+<section class="auth-card">
+
+    <a class="brand auth-brand" href="{% url 'home' %}">
+        <span class="brand-mark">💸</span>
+        <span>Xpense<span>Track</span></span>
+    </a>
+
+    <h1>Welcome back</h1>
+
+    <p>
+        Login to open your expense dashboard.
+    </p>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <label>
+            Username
+            {{ form.username }}
+        </label>
+
+        <label>Password</label>
+
+<div class="password-wrapper">
+    {{ form.password }}
+
+    <span class="toggle-password"
+          onclick="togglePasswordVisibility()">
+        <i id="eyeIcon" class="fa-regular fa-eye"></i>
+    </span>
+</div>
+
+        {{ form.errors }}
+
+        <button type="submit">
+            Login
+        </button>
+
+    </form>
+
+    <p class="auth-switch">
+        New here?
+        <a href="{% url 'signup' %}">
+            Create an account
+        </a>
+    </p>
+
+</section>
+
+
+<div class="finance-ticker">
+
+    <span>📈 Financial Health Tracking</span>
+
+    <span>💰 Smart Savings Goals</span>
+
+    <span>🎯 Budget Monitoring</span>
+
+    <span>🔒 Secure Authentication</span>
+
+    <span>📊 Expense Analytics</span>
+
+    <span>💳 Transaction Management</span>
+
+</div>
+
+{% endblock %}

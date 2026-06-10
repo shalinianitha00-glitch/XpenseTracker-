@@ -1,0 +1,43 @@
+{% extends "tracker/base.html" %}
+{% block title %}Categories{% endblock %}
+{% block subtitle %}Manage your expense categories{% endblock %}
+{% block content %}
+  <script>
+    window.XPENSE_CHARTS = {{ chart_json|safe }};
+  </script>
+  <form class="panel inline-form" method="post">
+    {% csrf_token %}
+    <label>Category Name{{ form.name }}</label>
+    <label>Emoji{{ form.emoji }}</label>
+    <label>Color{{ form.color }}</label>
+    <button type="submit">+ Add Category</button>
+    {{ form.errors }}
+  </form>
+  <section class="split-grid">
+    <div class="panel table-panel">
+      <div class="panel-head">
+        <h2>Category Library</h2>
+      </div>
+      <table>
+        <thead><tr><th>Category</th><th>Icon</th><th>Total Spent</th><th>Percentage</th><th>Action</th></tr></thead>
+        <tbody>
+          {% for cat in categories %}
+            <tr>
+              <td>{{ cat.name }}</td><td><span class="mini-icon">{{ cat.emoji }}</span></td><td>₹{{ cat.spent|floatformat:2 }}</td><td>{{ cat.percent }}%</td>
+              <td>
+                <form method="post" action="{% url 'delete_category' cat.id %}" onsubmit="return confirm('Delete this category?')">
+                  {% csrf_token %}
+                  <button class="ghost" type="submit">⌫</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="panel chart-panel">
+      <h2>Category Distribution</h2>
+      <canvas id="categoryDoughnut"></canvas>
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "tracker/auth_base.html" %}
+{% block title %}Create Account | XpenseTrack{% endblock %}
+{% block content %}
+  <div class="auth-hero">
+
+    <div class="hero-circle circle-1"></div>
+    <div class="hero-circle circle-2"></div>
+
+    <h1>💸 Manage Money Smarter</h1>
+
+    <p>
+        Track expenses, manage budgets,
+        monitor savings goals and gain
+        powerful financial insights.
+    </p>
+
+    <div class="hero-features">
+        <div>📈 Smart Analytics</div>
+        <div>🎯 Budget Tracking</div>
+        <div>💰 Savings Goals</div>
+        <div>🔔 Daily Reminders</div>
+    </div>
+
+</div>
+<div class="hero-stats">
+    <div>
+        <strong>10K+</strong>
+        <span>Transactions Tracked</span>
+    </div>
+
+    <div>
+        <strong>₹5L+</strong>
+        <span>Savings Managed</span>
+    </div>
+</div>
+<div class="floating-icons">
+
+    <div class="floating-icon icon-wallet">💳</div>
+
+    <div class="floating-icon icon-chart">📈</div>
+
+    <div class="floating-icon icon-money">💰</div>
+
+</div>
+  <section class="auth-card signup-card">
+    <a class="brand auth-brand" href="{% url 'home' %}">
+      <span class="brand-mark">💸</span>
+      <span>Xpense<span>Track</span></span>
+    </a>
+    <h1>Create your account</h1>
+    <p>Start tracking expenses, budgets, reports, and savings goals.</p>
+    <form method="post">
+      {% csrf_token %}
+      <label>Username{{ form.username }}</label>
+      <label>Name{{ form.first_name }}</label>
+      <label>Email{{ form.email }}</label>
+ <div class="password-wrapper">
+    {{ form.password1 }}
+
+    <span id="togglePassword1" class="toggle-password">
+        <i class="fa-regular fa-eye"></i>
+    </span>
+</div>
+
+<div class="password-wrapper">
+    {{ form.password2 }}
+
+    <span id="togglePassword2" class="toggle-password">
+        <i class="fa-regular fa-eye"></i>
+    </span>
+</div>
+
+<div id="password-match-status"></div>
+  
+<div id="strength-text"></div>
+
+      <div class="password-rules">
+    <small>Password must contain:</small>
+    <ul>
+        <li>At least 8 characters</li>
+        <li>One uppercase letter (A-Z)</li>
+        <li>One lowercase letter (a-z)</li>
+        <li>One number (0-9)</li>
+        <li>One special character (@, #, $, %, etc.)</li>
+    </ul>
+</div>
+
+
+
+      {{ form.errors }}
+      <button type="submit">Create Account</button>
+    </form>
+    <p class="auth-switch">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+  </section>
+{% endblock %}
