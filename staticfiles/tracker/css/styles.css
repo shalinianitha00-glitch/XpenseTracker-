@@ -619,8 +619,8 @@ body.theme-light .quick-grid button{
     color:#0f172a;
 }
 
-body.theme-light .quick-grid button span{
-    color:#0f172a;
+body.theme-light .quick-grid button span {
+    color: #dbe6ff;
 }
 .small-summary { text-align: center; margin-top: -80px; pointer-events: none; }
 .small-summary b { display: block; font-size: 22px; }
