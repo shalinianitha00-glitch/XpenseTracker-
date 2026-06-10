@@ -77,7 +77,7 @@ class SavingsGoalForm(forms.ModelForm):
 
 class PreferenceForm(forms.ModelForm):
     theme = forms.ChoiceField(choices=[("dark", "Dark Navy"), ("light", "Light"), ("ocean", "Ocean Cyan"), ("sunset", "Sunset Pink")])
-    currency = forms.ChoiceField(choices=[("INR", "INR (₹)"), ("USD", "USD ($)"), ("EUR", "EUR (€)")])
+    currency = forms.ChoiceField(choices=[("INR", "INR (₹)")])
     date_format = forms.ChoiceField(choices=[("DD/MM/YYYY", "DD/MM/YYYY")])
 
     class Meta:
