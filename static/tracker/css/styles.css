@@ -622,7 +622,6 @@ body.theme-light .quick-grid button{
 body.theme-light .quick-grid button {
     color: var(--text);
 }
-
 .quick-grid button span {
     color: var(--text);
 }
