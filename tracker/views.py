@@ -423,6 +423,97 @@ def month_end_surplus_analysis(user, month_start):
     }
 
 
+def daily_expense_reminder_context(user, preference):
+    today = timezone.localdate()
+    has_transaction_today = Transaction.objects.filter(user=user, date=today).exists()
+    show_reminder = preference.daily_expense_reminder_enabled and not has_transaction_today
+    reminder_message = "You have not recorded today's expenses. Please update your expenses." if show_reminder else ""
+    return {
+        "show_expense_reminder": show_reminder,
+        "reminder_message": reminder_message,
+        "has_transaction_today": has_transaction_today,
+        "daily_reminder_pending": show_reminder,
+        "daily_reminder_enabled": preference.daily_expense_reminder_enabled,
+        "daily_reminder_time": preference.daily_expense_reminder_time,
+    }
+
+
+def build_daily_expense_reminder_email(user, reminder_message):
+    return {
+        "subject": "XpenseTrack Daily Expense Reminder",
+        "message": reminder_message,
+        "recipient_list": [user.email] if user.email else [],
+    }
+
+
+def ai_financial_advisor_recommendations(user, month_start):
+    month_qs = Transaction.objects.select_related("category").filter(
+        user=user,
+        date__year=month_start.year,
+        date__month=month_start.month,
+    )
+    total_income = month_qs.filter(transaction_type="income").aggregate(total=Sum("amount"))["total"] or Decimal("0")
+    total_expenses = month_qs.filter(transaction_type="expense").aggregate(total=Sum("amount"))["total"] or Decimal("0")
+    total_savings = total_income - total_expenses
+    recommendations = []
+
+    if total_expenses > total_income:
+        recommendations.append({
+            "type": "warning",
+            "message": "⚠️ Your expenses exceeded your income this month. Consider reducing unnecessary spending.",
+        })
+
+    if total_income > 0:
+        savings_rate = (total_savings / total_income) * 100
+        if savings_rate > 20:
+            recommendations.append({
+                "type": "success",
+                "message": "✅ Excellent! You are maintaining good savings habits. Keep it up!",
+            })
+        elif savings_rate < 10:
+            recommendations.append({
+                "type": "warning",
+                "message": "⚠️ Your savings are low. Try saving at least 20% of your income.",
+            })
+
+    for budget in Budget.objects.select_related("category").filter(user=user):
+        if budget.progress >= 90:
+            recommendations.append({
+                "type": "danger",
+                "message": f"🚨 Warning! You have almost exhausted your budget for {budget.category.name}.",
+            })
+
+    if total_expenses > 0:
+        food_expenses = month_qs.filter(
+            transaction_type="expense",
+            category__name__icontains="food",
+        ).aggregate(total=Sum("amount"))["total"] or Decimal("0")
+        dining_expenses = month_qs.filter(
+            transaction_type="expense",
+            category__name__icontains="dining",
+        ).exclude(category__name__icontains="food").aggregate(total=Sum("amount"))["total"] or Decimal("0")
+        food_dining_expenses = food_expenses + dining_expenses
+        if (food_dining_expenses / total_expenses) * 100 > 40:
+            recommendations.append({
+                "type": "info",
+                "message": "🍔 A significant portion of your expenses is spent on food. Consider reducing dining expenses.",
+            })
+
+    if not Transaction.objects.filter(user=user, date=timezone.localdate()).exists():
+        recommendations.append({
+            "type": "info",
+            "message": "📝 You have not recorded today's expenses. Please update your expenses.",
+        })
+
+    if not recommendations:
+        recommendations.append({
+            "type": "success",
+            "message": "✅ Your finances look balanced this month. Keep tracking consistently.",
+        })
+
+    return recommendations
+
+
 def base_context(active, user, request=None):
     preference = ensure_user_defaults(user)
     month_start = selected_month(request) if request else date(timezone.localdate().year, timezone.localdate().month, 1)
@@ -453,6 +544,7 @@ def base_context(active, user, request=None):
         ]
     category_chart_rows = [cat for cat in categories if cat["spent"] > 0]
     emergency_summary = emergency_fund_summary(user)
+    reminder_context = daily_expense_reminder_context(user, preference)
 
     currency_symbol = "₹"
 
@@ -499,6 +591,7 @@ def base_context(active, user, request=None):
             or "U"
             )[:1].upper(),
         "money": money,
+        **reminder_context,
     }
 
 
@@ -567,6 +660,7 @@ def dashboard(request):
     context["daily_reminder_enabled"] = context["preference"].daily_expense_reminder_enabled
     context["daily_reminder_time"] = context["preference"].daily_expense_reminder_time
     context["surplus_analysis"] = month_end_surplus_analysis(request.user, month_start)
+    context["ai_recommendations"] = ai_financial_advisor_recommendations(request.user, month_start)
     context.update(smart_dashboard_insights(request.user, month_start, financial_health))
     return render(request, "tracker/dashboard.html", context)
 

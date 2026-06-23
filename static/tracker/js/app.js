@@ -149,6 +149,60 @@ function mountQuickCategories() {
   });
 }
 
+function mountReminderDismiss() {
+  document.querySelectorAll("[data-dismiss-reminder]").forEach(button => {
+    button.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      const card = button.closest("[data-reminder-card]");
+      const popover = button.closest(".notification-popover");
+      const badge = document.querySelector(".notification-badge");
+      if (card) card.hidden = true;
+      if (badge) badge.remove();
+      if (popover && !popover.querySelector(".notification-card.complete")) {
+        const emptyCard = document.createElement("div");
+        emptyCard.className = "notification-card complete";
+        emptyCard.innerHTML = "<b>Reminder dismissed</b><p>Add today's transaction to clear it fully.</p>";
+        popover.appendChild(emptyCard);
+      }
+    });
+  });
+}
+
+function mountFlashMessages() {
+  const seenMessages = new Set();
+  document.querySelectorAll(".message").forEach(message => {
+    const text = message.textContent.trim();
+    if (seenMessages.has(text)) {
+      message.remove();
+      return;
+    }
+    seenMessages.add(text);
+    window.setTimeout(() => {
+      message.classList.add("is-hiding");
+      window.setTimeout(() => message.remove(), 350);
+    }, 4000);
+  });
+}
+
+function mountFormSubmitGuard() {
+  document.querySelectorAll("form").forEach(form => {
+    form.addEventListener("submit", event => {
+      if (form.dataset.submitting === "true") {
+        event.preventDefault();
+        return;
+      }
+      form.dataset.submitting = "true";
+      form.querySelectorAll("button[type='submit']").forEach(button => {
+        button.setAttribute("aria-disabled", "true");
+        button.style.pointerEvents = "none";
+        button.dataset.originalText = button.textContent;
+        button.textContent = "Please wait...";
+      });
+    });
+  });
+}
+
 if (typeof Chart !== "undefined") {
 
     mountLineChart();
@@ -160,6 +214,9 @@ mountSearch();
 mountMenus();
 mountSettingsTabs();
 mountQuickCategories();
+mountReminderDismiss();
+mountFlashMessages();
+mountFormSubmitGuard();
 
 document.addEventListener("DOMContentLoaded", function () {
 

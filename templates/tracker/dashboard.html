@@ -12,6 +12,18 @@
     </div>
   {% endif %}
   {% include "tracker/partials/summary_cards.html" %}
+  <section class="panel ai-advisor-card">
+    <div class="panel-head">
+      <h2>🤖 AI Financial Advisor</h2>
+    </div>
+    <div class="ai-advisor-list">
+      {% for recommendation in ai_recommendations %}
+        <article class="ai-advice {{ recommendation.type }}">
+          {{ recommendation.message }}
+        </article>
+      {% endfor %}
+    </div>
+  </section>
   <section class="dashboard-grid">
     <div class="panel chart-panel wide">
       <div class="panel-head">

@@ -50,10 +50,29 @@
           <input id="topMonth" name="month" type="month" value="{{ selected_month_value }}" onchange="this.form.submit()">
         </form>
         <div class="top-menu">
-          <button class="icon-btn js-menu-btn" type="button" aria-label="Notifications" data-menu="notificationsMenu">🔔<span></span></button>
-          <div class="popover" id="notificationsMenu" hidden>
-            <strong>Notifications</strong>
-            <p>No new alerts</p>
+          <button class="icon-btn notification-btn js-menu-btn" type="button" aria-label="Notifications" data-menu="notificationsMenu">
+            &#128276;
+            {% if show_expense_reminder %}<span class="notification-badge"></span>{% endif %}
+          </button>
+          <div class="popover notification-popover" id="notificationsMenu" hidden>
+            <div class="notification-head">
+              <strong>Notifications</strong>
+              {% if show_expense_reminder %}<small>1 new</small>{% endif %}
+            </div>
+            {% if show_expense_reminder %}
+              <div class="notification-card" data-reminder-card>
+                <b>Daily Expense Reminder</b>
+                <p>{{ reminder_message }}</p>
+                <small>Reminder time: {{ daily_reminder_time|time:"h:i A" }}</small>
+                <a href="{% url 'add_expense' %}">Add Transaction</a>
+                <button class="ghost dismiss-reminder" type="button" data-dismiss-reminder>Dismiss</button>
+              </div>
+            {% else %}
+              <div class="notification-card complete">
+                <b>Today's expenses recorded</b>
+                <p>No reminder needed right now.</p>
+              </div>
+            {% endif %}
           </div>
         </div>
         <div class="profile top-menu">

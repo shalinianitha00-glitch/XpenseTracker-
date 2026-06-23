@@ -13,7 +13,6 @@
       <label>Date{{ form.date }}</label>
       <label>Payment Method{{ form.payment_method }}</label>
       <label>Status{{ form.status }}</label>
-      <label>Notes{{ form.notes }}</label>
       {{ form.errors }}
       <div class="form-actions"><a class="cancel-btn" href="{% url 'transactions' %}">Cancel</a><button type="submit">{% if editing_transaction %}Update Transaction{% else %}Save Transaction{% endif %}</button></div>
     </form>

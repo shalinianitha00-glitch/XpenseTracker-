@@ -14,10 +14,9 @@ class ExpenseForm(forms.ModelForm):
 
     class Meta:
         model = Transaction
-        fields = ["title", "transaction_type", "amount", "category", "date", "payment_method", "notes", "status"]
+        fields = ["title", "transaction_type", "amount", "category", "date", "payment_method", "status"]
         widgets = {
             "date": forms.DateInput(attrs={"type": "date"}),
-            "notes": forms.Textarea(attrs={"rows": 4}),
         }
 
 
@@ -29,10 +28,9 @@ class IncomeForm(forms.ModelForm):
 
     class Meta:
         model = Transaction
-        fields = ["title", "amount", "category", "date", "payment_method", "notes", "status"]
+        fields = ["title", "amount", "category", "date", "payment_method", "status"]
         widgets = {
             "date": forms.DateInput(attrs={"type": "date"}),
-            "notes": forms.Textarea(attrs={"rows": 4}),
         }
 
     def save(self, commit=True):
